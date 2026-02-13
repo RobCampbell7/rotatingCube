@@ -47,9 +47,21 @@ int main(){
     };
     translate(cube, -0.5, -0.5, -0.5);
     scale(cube, r, r, r);
+
     midpoint(cube, &x, &y, &z);
-    printf("midpoint = (%f, %f, %f)\n", x, y, z);
+    printf("midpoint = (%f, %f, %f)\n\n", x, y, z);
+    
     printCoords(cube);
+    
+    printf("\n");
+
+    rotate(cube, M_PI/2, M_PI/8, 0);
+
+    midpoint(cube, &x, &y, &z);
+    printf("midpoint = (%f, %f, %f)\n\n", x, y, z);
+    
+    printCoords(cube);
+    
     return 0;
 }
 void translate(double cube[8][3], double dx, double dy, double dz){
