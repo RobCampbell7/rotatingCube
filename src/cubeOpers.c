@@ -19,20 +19,19 @@ void projectInZ(double cube[8][3], double z1, double projectedCube[8][2]);
 void midpoint(double cube[8][3], double *x, double *y, double *z);
 
 void printCoords(double cube[8][3]);
-
+/*
+      5------6
+     /|     /|
+    / |    / |
+   1------2  |
+   |  |   |  |
+   |  4---|--7
+   | /    | /
+   |/     |/
+   0------3
+*/ 
+/*
 int main(){
-    /*
-        5-------6
-       /|      /|
-      / |     / |
-     1-------2  |
-     |  |    |  |
-     |  4----|--7
-     | /     | /
-     |/      |/
-     0-------3
-    KEEP THIS WINDING ORDER CONSISTENT OR IT ALL GOES TITS UP
-    */
     double r = 2;
     double x, y, z;
     double cube[8][3] = {
@@ -64,6 +63,7 @@ int main(){
     
     return 0;
 }
+*/
 void translate(double cube[8][3], double dx, double dy, double dz){
     for (int i=0; i<8; i++) {
         cube[i][0] += dx;
