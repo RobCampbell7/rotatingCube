@@ -16,33 +16,36 @@ void rotateInZ(double cube[8][3], double theta);
 
 void projectInZ(double cube[8][3], double z1, double projectedCube[8][2]);
 
+void projectPointInZ(double p[3], double z1, double newP[2]);
+
 void midpoint(double cube[8][3], double *x, double *y, double *z);
 
 void printCoords(double cube[8][3]);
 /*
-      5------6
+      e------f
      /|     /|
     / |    / |
-   1------2  |
+   a------b  |
    |  |   |  |
-   |  4---|--7
+   |  h---|--g
    | /    | /
    |/     |/
-   0------3
+   d------c
 */ 
 /*
 int main(){
     double r = 2;
     double x, y, z;
     double cube[8][3] = {
-        {0, 0, 0},
+        
         {0, 1, 0},
         {1, 1, 0},
         {1, 0, 0},
-        {0, 0, 1},
+        {0, 0, 0},
         {0, 1, 1},
         {1, 1, 1},
         {1, 0, 1},
+        {0, 0, 1},
     };
     translate(cube, -0.5, -0.5, -0.5);
     scale(cube, r, r, r);
@@ -131,6 +134,10 @@ void projectInZ(double cube[8][3], double z1, double projectedCube[8][2]){
         projectedCube[i][0] = x * z1 / z;
         projectedCube[i][1] = y * z1 / z;
    }
+}
+void projectPointInZ(double p[3], double z1, double projectedPoint[2]){
+    projectedPoint[0] = p[0] * z1 / p[2];
+    projectedPoint[1] = p[1] * z1 / p[2];
 }
 void midpoint(double cube[8][3], double *x, double *y, double *z){
     double xSum = 0;
