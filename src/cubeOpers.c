@@ -22,15 +22,15 @@ void midpoint(double cube[8][3], double *x, double *y, double *z);
 
 void printCoords(double cube[8][3]);
 /*
-      e------f
-     /|     /|
-    / |    / |
-   a------b  |
-   |  |   |  |
-   |  h---|--g
-   | /    | /
-   |/     |/
-   d------c
+      e--------f
+     /|       /|
+    / |      / |
+   a--------b  |
+   |  |     |  |
+   |  h-----|--g
+   | /      | /
+   |/       |/
+   d--------c
 */ 
 /*
 int main(){
