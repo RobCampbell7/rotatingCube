@@ -25,6 +25,8 @@ double triangleArea(double a[2], double b[2], double c[2]);
 double quadrilateralArea(double a[2], double b[2], double c[2], double d[2]);
 
 double faceArea(double face[4][2]);
+
+void sleepMS(int milliseconds);
 /*
         e--------f
        /|       /|
@@ -59,6 +61,10 @@ int main(){
     double areaSum;
     int screenWidth, screenHeight, fps, i, j, k, f, v;
 
+    alpha = toRadians(1);
+    beta = toRadians(1);
+    gamma = toRadians(0);
+
     xMin = -1;
     xMax = 1;
     yMin = -1;
@@ -85,10 +91,10 @@ int main(){
     scale(cube, r, r, r);
     //rotate(cube, M_PI/8, 0, 0);
     while (!stop){
+        rotate(cube, alpha, beta, gamma);
         translate(cube, 0, 0, z1);
-        printCoords(cube);
+        //printCoords(cube);
         
-        //rotate(cube, alpha, beta, gamma);
         projectInZ(cube, 1, projectedCube);
         //print2DCoords(projectedCube);
         visibleFaces(cube, visible);
@@ -100,14 +106,15 @@ int main(){
                 projectedFaces[f][v][0] = projectedCube[faceIndices[f][v]][0];
                 projectedFaces[f][v][1] = projectedCube[faceIndices[f][v]][1];
             }
+            faceAreas[f] = visible[f] ? faceArea(projectedFaces[f]) : 0;
         } 
 
-        for (f=0; f<6; f++){
-            faceAreas[f] = faceArea(projectedFaces[f]);
-            //faceAreas[f] = visible[f] ? faceArea(projectedFaces[f]) : 0;
-            printf("%d ", visible[f]);
-        }
-        printf("\n");
+        /*for (f=0; f<6; f++){
+            //faceAreas[f] = faceArea(projectedFaces[f]);
+            faceAreas[f] = visible[f] ? faceArea(projectedFaces[f]) : 0;
+            //printf("%d ", visible[f]);
+        }*/
+        //printf("\n");
         //printCoords(cube);
         for (int k=0; k<screenWidth*screenHeight; k++){
             i = k % screenWidth;
@@ -137,16 +144,16 @@ int main(){
                 screen[k] = '-';
             }
         }
-        //clear();
-        printf("----\n");
+        clear();
+        //printf("----\n");
         for (k=0; k<screenWidth*screenHeight; k++){
             if (k % screenWidth == 0){
                 printf("\n");
             }
             printf("%c", screen[k]);
         }
-        printf("\n----\n");
-        sleep(1);
+        //printf("\n----\n");
+        sleepMS(10);
         // Display time
     }
     return 0;
@@ -186,4 +193,7 @@ double faceArea(double face[4][2]){
 }
 double quadrilateralArea(double a[2], double b[2], double c[2], double d[2]){
     return triangleArea(a, b, c) + triangleArea(c, d, a);
+}
+void sleepMS(int milliseconds){
+    usleep(milliseconds * 1000);
 }
