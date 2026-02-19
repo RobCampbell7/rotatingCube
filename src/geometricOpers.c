@@ -24,7 +24,9 @@ void centroid(double face[4][3], double c[3]){
     c[0] = (face[0][0] + face[1][0] + face[2][0] + face[3][0]) / 4;
     c[1] = (face[0][1] + face[1][1] + face[2][1] + face[3][1]) / 4;
     c[2] = (face[0][2] + face[1][2] + face[2][2] + face[3][2]) / 4;
-    c[3] = (face[0][3] + face[1][3] + face[2][3] + face[3][3]) / 4;
+    printf("(%f + %f + %f + %f)/4 = %f\n", face[0][0], face[1][0], face[2][0], face[3][0], c[0]);
+    printf("(%f + %f + %f + %f)/4 = %f\n", face[0][1], face[1][1], face[2][1], face[3][1], c[1]);
+    printf("(%f + %f + %f + %f)/4 = %f\n", face[0][2], face[1][2], face[2][2], face[3][2], c[2]);
 }
 void cross(double a[3], double b[3], double c[3]){
     c[0] = a[1] * b[2] - a[2] * b[1];

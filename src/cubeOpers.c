@@ -21,6 +21,8 @@ void projectPointInZ(double p[3], double z1, double newP[2]);
 void midpoint(double cube[8][3], double *x, double *y, double *z);
 
 void printCoords(double cube[8][3]);
+
+void print2DCoords(double cube[8][2]);
 /*
       e--------f
      /|       /|
@@ -155,6 +157,15 @@ void midpoint(double cube[8][3], double *x, double *y, double *z){
 void printCoords(double cube[8][3]){
     for (int i=0; i<8; i++){
         printf("(%.1f, %.1f, %.1f)", cube[i][0], cube[i][1], cube[i][2]);
+        if (i < 7){
+            printf(",\n");
+        }
+    }
+    printf("\n");
+}
+void print2DCoords(double cube[8][2]){
+    for (int i=0; i<8; i++){
+        printf("(%.1f, %.1f)", cube[i][0], cube[i][1]);
         if (i < 7){
             printf(",\n");
         }
