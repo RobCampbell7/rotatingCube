@@ -62,18 +62,21 @@ int main(){
     bool emptySpace, visible[6], stop = false;
     time_t lastFrame, now;
 
-    char faceChars[6] = {'0', '1', '2', '3', '4', '5'}, emptyChar = ' ';
+    // Characters for each face, in same order as faceIndices list
+    char faceChars[6] = {'#', 'H', ';', '!', '+', '='};
+    // Character for an empty space outside of cube
+    double emptyChar = ' ';
     
     alpha = toRadians(1);
     beta = toRadians(1);
-    gamma = toRadians(0);
+    gamma = toRadians(0.2);
 
     xMin = -1;
     xMax = 1;
     yMin = -1;
     yMax = 1;
     z1 = 1;
-    deltaZ = 4;
+    deltaZ = 3;
     r = 2;
     screenWidth = 60;
     screenHeight = 30;
