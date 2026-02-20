@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
 #include <unistd.h>
@@ -39,8 +40,11 @@ void sleepMS(int milliseconds);
      d--------c
 
     KEEP THIS WINDING ORDER CONSISTENT OR ELSE THINGS GO BAD
+    Face order follows left hand rule.
 */
 int main(){
+    // Cube is initialised at simpler coordinates. Then it is translated and scaled to have a
+    // centre at the origin and all side lengths equal to r
     double cube[8][3] = {
         {0, 1, 0},
         {1, 1, 0},
@@ -51,16 +55,15 @@ int main(){
         {1, 0, 1},
         {0, 0, 1},
     };
-    double coord[2];
-    double projectedFaces[6][4][2]; 
-    double projectedCube[8][2];
-    double alpha, beta, gamma;
-    double r, x, y, z1;
+    double coord[2], projectedFaces[6][4][2], projectedCube[8][2], faceAreas[6];
+    double alpha, beta, gamma, r, x, y, z1, deltaZ, areaSum;
     double xMin, yMin, xMax, yMax, xUnit, yUnit;
-    double faceAreas[6];
-    double areaSum;
     int screenWidth, screenHeight, fps, i, j, k, f, v;
+    bool emptySpace, visible[6], stop = false;
+    time_t lastFrame, now;
 
+    char faceChars[6] = {'0', '1', '2', '3', '4', '5'}, emptyChar = ' ';
+    
     alpha = toRadians(1);
     beta = toRadians(1);
     gamma = toRadians(0);
@@ -69,7 +72,8 @@ int main(){
     xMax = 1;
     yMin = -1;
     yMax = 1;
-    z1 = 6;
+    z1 = 1;
+    deltaZ = 4;
     r = 2;
     screenWidth = 60;
     screenHeight = 30;
@@ -78,12 +82,6 @@ int main(){
     xUnit = (xMax - xMin) / screenWidth;
     yUnit = (yMax - yMin) / screenHeight;
 
-    bool stop = false;
-    bool emptySpace = false;
-    time_t lastFrame, now;
-    bool visible[6];
-
-    char faceChars[6] = {'0', '1', '2', '3', '4', '5'};
     double timePerFrame = 1./((double)fps);
     char screen[screenWidth * screenHeight];
     
@@ -92,14 +90,12 @@ int main(){
     //rotate(cube, M_PI/8, 0, 0);
     while (!stop){
         rotate(cube, alpha, beta, gamma);
-        translate(cube, 0, 0, z1);
-        //printCoords(cube);
-        
-        projectInZ(cube, 1, projectedCube);
-        //print2DCoords(projectedCube);
+        translate(cube, 0, 0, deltaZ);
+       
+        projectInZ(cube, z1, projectedCube);
         visibleFaces(cube, visible);
 
-        translate(cube, 0, 0, -z1);
+        translate(cube, 0, 0, -deltaZ);
 
         for (f = 0; f < 6; f++){
             for (v = 0; v < 4; v++){
@@ -107,24 +103,17 @@ int main(){
                 projectedFaces[f][v][1] = projectedCube[faceIndices[f][v]][1];
             }
             faceAreas[f] = visible[f] ? faceArea(projectedFaces[f]) : 0;
-        } 
-
-        /*for (f=0; f<6; f++){
-            //faceAreas[f] = faceArea(projectedFaces[f]);
-            faceAreas[f] = visible[f] ? faceArea(projectedFaces[f]) : 0;
-            //printf("%d ", visible[f]);
-        }*/
-        //printf("\n");
-        //printCoords(cube);
+        }
         for (int k=0; k<screenWidth*screenHeight; k++){
             i = k % screenWidth;
             j = k / screenWidth;
 
             coord[0] = xMin + i * xUnit;
             coord[1] = yMin + j * yUnit;
-            //printf("(i, j) = (%d, %d) -> (x, y) = (%f, %f)\n", i, j, coord[0], coord[1]);
             emptySpace = true;
             for (f=0; f<6; f++){
+                if (visible[f] == false)
+                    continue;
                 areaSum = 0;
                 areaSum += triangleArea(projectedFaces[f][0], projectedFaces[f][1], coord);
                 areaSum += triangleArea(projectedFaces[f][1], projectedFaces[f][2], coord);
@@ -133,49 +122,58 @@ int main(){
 
                 if (areaSum < faceAreas[f] + 1e-6){
                     screen[k] = faceChars[f];
-                    //printf("\nareaSum  : %f\n", areaSum);
-                    //printf("faceArea : %f\n", faceAreas[f]);
                     emptySpace = false;
-                    //printf("FINALLY!!!");
                     break;
                 }
             }
+            // If the point does not fall inside any visible faces it is given
+            // the empty character
             if (emptySpace == true){
-                screen[k] = '-';
+                screen[k] = emptyChar;
             }
         }
-        clear();
-        //printf("----\n");
+        // Printing the screen to console
+        clear(); // Clears the screen
         for (k=0; k<screenWidth*screenHeight; k++){
             if (k % screenWidth == 0){
                 printf("\n");
             }
             printf("%c", screen[k]);
         }
-        //printf("\n----\n");
-        sleepMS(10);
-        // Display time
+        sleepMS(10); // Temporary method until fps is implemented
     }
     return 0;
 }
 void visibleFaces(double cube[8][3], bool visibleFacesMask[6]){
+    /*
+    This method works out which faces of the cube are visible from the origin.
+    It modifies the visibleFacesMask list so if a face is visible its corresponding index is set
+    to true.
+    By using the faceIndices constant we ensure this is handling consistently to prevent issues
+    */
     double v1[3], v2[3], cp[3], n[3], ce[3];
 
     for (int i = 0; i < 6; i++){
+        // These are the vectors of corners of this face
         double *a = cube[faceIndices[i][0]];
         double *b = cube[faceIndices[i][1]];
         double *c = cube[faceIndices[i][2]];
         double *d = cube[faceIndices[i][3]];
 
+        // We find v1 and v2, two vectors that follow this plane, compute the cross product, cp, 
+        // and normalise it to give the vector n.
         sub(b, a, v1);
         sub(c, a, v2);
         cross(v1, v2, cp);
         normalise(cp, n);
 
+        // Finding the centroid of the face
         ce[0] = (a[0] + b[0] + c[0] + d[0]) / 4;
         ce[1] = (a[1] + b[1] + c[1] + d[1]) / 4;
         ce[2] = (a[2] + b[2] + c[2] + d[2]) / 4;
 
+        // If the dot product of n and ce is positive then this face is visible, this effectively
+        // checks if the vector n from the centroid points towards the origin
         visibleFacesMask[i] = (dot(n, ce) < 0);
     }
 }
@@ -184,8 +182,6 @@ double toRadians(double angleInDegrees){
 }
 double triangleArea(double a[2], double b[2], double c[2]){
     double A = a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1]);
-    //printf("a:(%f, %f, %f) ~ b:(%f, %f, %f) c:(%f, %f, %f)", a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]);
-    //printf("A = %f, fabs(A)/2 = %f\n", A, fabs(A) / 2);
     return fabs(A) / 2;
 }
 double faceArea(double face[4][2]){
