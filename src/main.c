@@ -56,11 +56,11 @@ int main(){
         {0, 0, 1},
     };
     double coord[2], projectedFaces[6][4][2], projectedCube[8][2], faceAreas[6];
-    double alpha, beta, gamma, r, x, y, z1, deltaZ, areaSum;
+    double alpha, beta, gamma, r, x, y, z1, deltaZ, areaSum, targetFrametime, frametime;
     double xMin, yMin, xMax, yMax, xUnit, yUnit;
     int screenWidth, screenHeight, fps, i, j, k, f, v;
     bool emptySpace, visible[6], stop = false;
-    time_t lastFrame, now;
+    struct timespec frameStart, frameEnd;
 
     // Characters for each face, in same order as faceIndices list
     char faceChars[6] = {'#', 'H', ';', '!', '+', '='};
@@ -84,13 +84,14 @@ int main(){
 
     xUnit = (xMax - xMin) / screenWidth;
     yUnit = (yMax - yMin) / screenHeight;
+    targetFrametime = 1./fps;
 
-    double timePerFrame = 1./((double)fps);
     char screen[screenWidth * screenHeight];
     
     translate(cube, -0.5, -0.5, -0.5);
     scale(cube, r, r, r);
-    //rotate(cube, M_PI/8, 0, 0);
+ 
+    clock_gettime(CLOCK_MONOTONIC, &frameStart);
     while (!stop){
         rotate(cube, alpha, beta, gamma);
         translate(cube, 0, 0, deltaZ);
@@ -135,6 +136,14 @@ int main(){
                 screen[k] = emptyChar;
             }
         }
+        // Gets the current time in seconds since boot.
+        // if the difference in time between the start of the frame and the end is greater than 
+        // the goal frame time then sleep for the difference before printing
+        clock_gettime(CLOCK_MONOTONIC, &frameEnd);
+        frametime = (frameEnd.tv_sec - frameEnd.tv_sec) + (frameEnd.tv_nsec - frameStart.tv_nsec)/1e9;
+        if (frametime < targetFrametime){
+            usleep((targetFrametime - frametime) * 1e6); // Works in microseconds
+        }
         // Printing the screen to console
         clear(); // Clears the screen
         for (k=0; k<screenWidth*screenHeight; k++){
@@ -143,7 +152,7 @@ int main(){
             }
             printf("%c", screen[k]);
         }
-        sleepMS(10); // Temporary method until fps is implemented
+        clock_gettime(CLOCK_MONOTONIC, &frameStart);
     }
     return 0;
 }
