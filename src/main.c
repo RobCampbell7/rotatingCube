@@ -70,16 +70,16 @@ int main(){
     beta = toRadians(-0.4);
     gamma = toRadians(0.2);
 
-    xMin = -1;
-    xMax = 1;
+    xMin = -2;
+    xMax = 2;
     yMin = -1;
     yMax = 1;
-    z1 = 1;
-    deltaZ = 3;
+    z1 = 3;
+    deltaZ = 10;
     r = 2;
-    screenWidth = 80;
-    screenHeight = 40;
-    fps = 240;
+    screenWidth = 192;
+    screenHeight = 48;
+    fps = 120;
 
     xUnit = (xMax - xMin) / screenWidth;
     yUnit = (yMax - yMin) / screenHeight;
