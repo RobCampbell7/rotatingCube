@@ -66,8 +66,8 @@ int main(){
     // Character for an empty space outside of cube
     char emptyChar = ' ';
     
-    alpha = toRadians(1);
-    beta = toRadians(1);
+    alpha = toRadians(0.1);
+    beta = toRadians(-0.4);
     gamma = toRadians(0.2);
 
     xMin = -1;
@@ -79,7 +79,7 @@ int main(){
     r = 2;
     screenWidth = 80;
     screenHeight = 40;
-    fps = 24;
+    fps = 240;
 
     xUnit = (xMax - xMin) / screenWidth;
     yUnit = (yMax - yMin) / screenHeight;
@@ -141,14 +141,16 @@ int main(){
             }
         }
         // Gets the current time in seconds since boot.
-        // if the difference in time between the start of the frame and the end is greater than 
-        // the goal frame time then sleep for the difference before printing
+        // until this targetFrametime has elapsed the frametime is continually calculated until it 
+        // is greater than or equal to frame time
  
         printf("\033[0;0H");
         clock_gettime(CLOCK_MONOTONIC, &frameEnd);
         frametime = (frameEnd.tv_sec - frameStart.tv_sec) + (frameEnd.tv_nsec - frameStart.tv_nsec)/1e9;
-        if (frametime < targetFrametime){
-            usleep((targetFrametime - frametime) * 1e6); // Works in microseconds
+        while (frametime < targetFrametime){
+            //usleep((targetFrametime - frametime) * 1e6); // Works in microseconds
+            clock_gettime(CLOCK_MONOTONIC, &frameEnd);
+            frametime = (frameEnd.tv_sec - frameStart.tv_sec) + (frameEnd.tv_nsec - frameStart.tv_nsec)/1e9;
         }
         // Clearing then printing the screen to console
         printf("%s", screen);
