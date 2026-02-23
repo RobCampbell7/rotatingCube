@@ -1,74 +1,5 @@
-#include <stdio.h>
 #include <math.h>
-#include <stdbool.h>
 
-void translate(double cube[8][3], double dx, double dy, double dz);
-
-void rotate(double cube[8][3], double alpha, double beta, double gamma);
-
-void scale(double cube[8][3], double fx, double fy, double fz);
-
-void rotateInX(double cube[8][3], double theta);
-
-void rotateInY(double cube[8][3], double theta);
-
-void rotateInZ(double cube[8][3], double theta);
-
-void projectInZ(double cube[8][3], double z1, double projectedCube[8][2]);
-
-void projectPointInZ(double p[3], double z1, double newP[2]);
-
-void midpoint(double cube[8][3], double *x, double *y, double *z);
-
-void printCoords(double cube[8][3]);
-
-void print2DCoords(double cube[8][2]);
-/*
-      e--------f
-     /|       /|
-    / |      / |
-   a--------b  |
-   |  |     |  |
-   |  h-----|--g
-   | /      | /
-   |/       |/
-   d--------c
-*/ 
-/*
-int main(){
-    double r = 2;
-    double x, y, z;
-    double cube[8][3] = {
-        
-        {0, 1, 0},
-        {1, 1, 0},
-        {1, 0, 0},
-        {0, 0, 0},
-        {0, 1, 1},
-        {1, 1, 1},
-        {1, 0, 1},
-        {0, 0, 1},
-    };
-    translate(cube, -0.5, -0.5, -0.5);
-    scale(cube, r, r, r);
-
-    midpoint(cube, &x, &y, &z);
-    printf("midpoint = (%f, %f, %f)\n\n", x, y, z);
-    
-    printCoords(cube);
-    
-    printf("\n");
-
-    rotate(cube, M_PI/2, M_PI/8, 0);
-
-    midpoint(cube, &x, &y, &z);
-    printf("midpoint = (%f, %f, %f)\n\n", x, y, z);
-    
-    printCoords(cube);
-    
-    return 0;
-}
-*/
 void translate(double cube[8][3], double dx, double dy, double dz){
     for (int i=0; i<8; i++) {
         cube[i][0] += dx;
@@ -127,7 +58,6 @@ void rotateInZ(double cube[8][3], double theta){
     }
 }
 void projectInZ(double cube[8][3], double z1, double projectedCube[8][2]){
-    // z1 > 0 <- IMPORTANT
     double x, y, z;
     for (int i=0; i<8; i++){
         x = cube[i][0];
@@ -154,6 +84,9 @@ void midpoint(double cube[8][3], double *x, double *y, double *z){
     *y = ySum / 8;
     *z = zSum / 8;
 }
+/*
+ These functions were for debugging but are kept here for posterity
+
 void printCoords(double cube[8][3]){
     for (int i=0; i<8; i++){
         printf("(%.1f, %.1f, %.1f)", cube[i][0], cube[i][1], cube[i][2]);
@@ -172,3 +105,4 @@ void print2DCoords(double cube[8][2]){
     }
     printf("\n");
 }
+*/

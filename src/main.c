@@ -3,8 +3,9 @@
 #include <stdbool.h>
 #include <time.h>
 #include <unistd.h>
-#include "cubeOpers.c"
-#include "geometricOpers.c"
+#include <math.h>
+#include "cubeOpers.h"
+#include "geometricOpers.h"
 
 #define clear() printf("\033[H\033[J")
 
@@ -80,7 +81,7 @@ int main(){
     r = 2;
     screenWidth = 60;
     screenHeight = 30;
-    fps = 24;
+    fps = 60;
 
     xUnit = (xMax - xMin) / screenWidth;
     yUnit = (yMax - yMin) / screenHeight;
