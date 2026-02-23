@@ -27,8 +27,6 @@ double triangleArea(double a[2], double b[2], double c[2]);
 double quadrilateralArea(double a[2], double b[2], double c[2], double d[2]);
 
 double faceArea(double face[4][2]);
-
-void sleepMS(int milliseconds);
 /*
         e--------f
        /|       /|
@@ -66,7 +64,7 @@ int main(){
     // Characters for each face, in same order as faceIndices list
     char faceChars[6] = {'#', 'H', ';', '!', '+', '='};
     // Character for an empty space outside of cube
-    double emptyChar = ' ';
+    char emptyChar = ' ';
     
     alpha = toRadians(1);
     beta = toRadians(1);
@@ -79,20 +77,21 @@ int main(){
     z1 = 1;
     deltaZ = 3;
     r = 2;
-    screenWidth = 60;
-    screenHeight = 30;
-    fps = 60;
+    screenWidth = 80;
+    screenHeight = 40;
+    fps = 24;
 
     xUnit = (xMax - xMin) / screenWidth;
     yUnit = (yMax - yMin) / screenHeight;
     targetFrametime = 1./fps;
 
-    char screen[screenWidth * screenHeight];
-    
+    char screen[(screenWidth + 1) * screenHeight + 1]; 
+    screen[(screenWidth + 1) * screenHeight] = '\0';
     translate(cube, -0.5, -0.5, -0.5);
     scale(cube, r, r, r);
  
     clock_gettime(CLOCK_MONOTONIC, &frameStart);
+    clear();
     while (!stop){
         rotate(cube, alpha, beta, gamma);
         translate(cube, 0, 0, deltaZ);
@@ -109,50 +108,50 @@ int main(){
             }
             faceAreas[f] = visible[f] ? faceArea(projectedFaces[f]) : 0;
         }
-        for (int k=0; k<screenWidth*screenHeight; k++){
-            i = k % screenWidth;
-            j = k / screenWidth;
+        for (int k=0; k<(screenWidth + 1)*screenHeight; k++){
+            i = k % (screenWidth + 1);
+            if (i == screenWidth){
+                screen[k] = '\n';
+            } else {
+                j = k / (screenWidth + 1);
 
-            coord[0] = xMin + i * xUnit;
-            coord[1] = yMin + j * yUnit;
-            emptySpace = true;
-            for (f=0; f<6; f++){
-                if (visible[f] == false)
-                    continue;
-                areaSum = 0;
-                areaSum += triangleArea(projectedFaces[f][0], projectedFaces[f][1], coord);
-                areaSum += triangleArea(projectedFaces[f][1], projectedFaces[f][2], coord);
-                areaSum += triangleArea(projectedFaces[f][2], projectedFaces[f][3], coord);
-                areaSum += triangleArea(projectedFaces[f][3], projectedFaces[f][0], coord);
-
-                if (areaSum < faceAreas[f] + 1e-6){
-                    screen[k] = faceChars[f];
-                    emptySpace = false;
-                    break;
+                coord[0] = xMin + i * xUnit;
+                coord[1] = yMin + j * yUnit;
+                emptySpace = true;
+                for (f=0; f<6; f++){
+                    if (visible[f] == false)
+                        continue;
+                   areaSum = 0;
+                   areaSum += triangleArea(projectedFaces[f][0], projectedFaces[f][1], coord);
+                   areaSum += triangleArea(projectedFaces[f][1], projectedFaces[f][2], coord);
+                   areaSum += triangleArea(projectedFaces[f][2], projectedFaces[f][3], coord);
+                    areaSum += triangleArea(projectedFaces[f][3], projectedFaces[f][0], coord);
+    
+                    if (areaSum < faceAreas[f] + 1e-6){
+                        screen[k] = faceChars[f];
+                        emptySpace = false;
+                        break;
+                    }
                 }
-            }
-            // If the point does not fall inside any visible faces it is given
-            // the empty character
-            if (emptySpace == true){
-                screen[k] = emptyChar;
+                // If the point does not fall inside any visible faces it is given
+                // the empty character
+                if (emptySpace == true){
+                    screen[k] = emptyChar;
+                }
             }
         }
         // Gets the current time in seconds since boot.
         // if the difference in time between the start of the frame and the end is greater than 
         // the goal frame time then sleep for the difference before printing
+ 
+        printf("\033[0;0H");
         clock_gettime(CLOCK_MONOTONIC, &frameEnd);
-        frametime = (frameEnd.tv_sec - frameEnd.tv_sec) + (frameEnd.tv_nsec - frameStart.tv_nsec)/1e9;
+        frametime = (frameEnd.tv_sec - frameStart.tv_sec) + (frameEnd.tv_nsec - frameStart.tv_nsec)/1e9;
         if (frametime < targetFrametime){
             usleep((targetFrametime - frametime) * 1e6); // Works in microseconds
         }
-        // Printing the screen to console
-        clear(); // Clears the screen
-        for (k=0; k<screenWidth*screenHeight; k++){
-            if (k % screenWidth == 0){
-                printf("\n");
-            }
-            printf("%c", screen[k]);
-        }
+        // Clearing then printing the screen to console
+        printf("%s", screen);
         clock_gettime(CLOCK_MONOTONIC, &frameStart);
     }
     return 0;
@@ -202,7 +201,4 @@ double faceArea(double face[4][2]){
 }
 double quadrilateralArea(double a[2], double b[2], double c[2], double d[2]){
     return triangleArea(a, b, c) + triangleArea(c, d, a);
-}
-void sleepMS(int milliseconds){
-    usleep(milliseconds * 1000);
 }
